@@ -1,0 +1,66 @@
+{
+    "name": "tallcms/real-estate-plugin",
+    "description": "A comprehensive Real Estate plugin for TALL CMS with advanced property search, filtering, and management features.",
+    "keywords": ["tallcms", "real-estate", "property", "livewire", "filament", "laravel"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TALL CMS Team",
+            "email": "info@tallcms.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1|^8.2|^8.3",
+        "laravel/framework": "^10.0|^11.0|^12.0",
+        "livewire/livewire": "^3.0",
+        "filament/filament": "^3.0",
+        "filament/forms": "^3.0",
+        "filament/tables": "^3.0",
+        "spatie/laravel-package-tools": "^1.16"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0",
+        "phpunit/phpunit": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TallCms\\RealEstate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TallCms\\RealEstate\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TallCms\\RealEstate\\RealEstateServiceProvider"
+            ]
+        },
+        "tallcms": {
+            "plugin": {
+                "name": "Real Estate",
+                "description": "Comprehensive real estate property management and search",
+                "version": "1.0.0",
+                "author": "TALL CMS Team",
+                "blocks": [
+                    "TallCms\\RealEstate\\Blocks\\PropertySearchBlock",
+                    "TallCms\\RealEstate\\Blocks\\PropertyListingsBlock",
+                    "TallCms\\RealEstate\\Blocks\\FeaturedPropertyBlock"
+                ],
+                "requirements": {
+                    "tallcms": "^1.0",
+                    "php": "^8.1"
+                }
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    }
+}
