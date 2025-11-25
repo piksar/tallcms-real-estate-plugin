@@ -9,6 +9,7 @@ use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use TallCms\RealEstate\Commands\InstallRealEstateCommand;
+use TallCms\RealEstate\Commands\UninstallRealEstateCommand;
 use TallCms\RealEstate\Commands\VerifyRealEstateCommand;
 use TallCms\RealEstate\Livewire\PropertySearchComponent;
 
@@ -35,6 +36,7 @@ class RealEstateServiceProvider extends PackageServiceProvider
             ])
             ->hasCommands([
                 InstallRealEstateCommand::class,
+                UninstallRealEstateCommand::class,
                 VerifyRealEstateCommand::class,
             ])
             ->hasRoute('web');

@@ -14,6 +14,8 @@ class Property extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'real_estate_properties';
+
     protected $fillable = [
         'title',
         'slug',

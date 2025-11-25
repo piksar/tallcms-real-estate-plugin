@@ -65,6 +65,8 @@
     "prefer-stable": true,
     "scripts": {
         "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "uninstall": "php artisan real-estate:uninstall",
+        "uninstall-full": "php artisan real-estate:uninstall --remove-data"
     }
 }

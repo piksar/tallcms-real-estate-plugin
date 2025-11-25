@@ -35,6 +35,12 @@ A comprehensive Real Estate plugin for TALL CMS featuring advanced property sear
 - **Tailwind CSS** for responsive design
 - **Alpine.js** for enhanced UX
 
+### 🔧 **Plugin Management**
+- Safe-by-default uninstall process
+- Data preservation options
+- Complete lifecycle management
+- Automated table cleanup with foreign key respect
+
 ## Requirements
 
 - PHP 8.1 or higher
@@ -113,6 +119,68 @@ php artisan vendor:publish --provider="TallCms\RealEstate\RealEstateServiceProvi
 php artisan db:seed --class="TallCms\RealEstate\Database\Seeders\RealEstateReferenceDataSeeder"
 ```
 
+## Uninstall
+
+The plugin provides safe and comprehensive uninstall options to protect your valuable property data.
+
+### 🛡️ Safe Uninstall (Recommended)
+
+**Removes code only, preserves all data:**
+
+```bash
+# Check current plugin state and data summary
+php artisan real-estate:uninstall
+
+# Remove plugin code (data preserved)
+composer remove tallcms/real-estate-plugin
+```
+
+**What this does:**
+- ✅ Removes plugin code and dependencies
+- ✅ Preserves all property data and tables
+- ✅ Allows reinstallation without data loss
+- ✅ Safe for production environments
+
+### 🗑️ Full Uninstall (Destructive)
+
+**Removes code AND all plugin data:**
+
+```bash
+# Full uninstall with data removal (requires confirmation)
+php artisan real-estate:uninstall --remove-data
+
+# Automated uninstall (skip confirmations)
+php artisan real-estate:uninstall --remove-data --force
+```
+
+**⚠️ Warning: This will permanently delete:**
+- All property listings and data
+- Property types, districts, amenities, features
+- All plugin tables and relationships
+- Migration records
+
+**Safety features:**
+- Shows data summary before deletion
+- Requires explicit confirmation ("DELETE ALL DATA")
+- Double confirmation for data removal
+- Respects foreign key constraints during table drops
+
+### Convenience Scripts
+
+```bash
+# Quick safe uninstall check
+composer uninstall
+
+# Quick full uninstall
+composer uninstall-full
+```
+
+### Uninstall Options
+
+- `--remove-data` - Remove all plugin tables and data (destructive)
+- `--force` - Skip confirmation prompts (for automation)
+- `--keep-migrations` - Keep migration records in database
+
 ## Configuration
 
 The plugin configuration file is located at `config/real-estate.php`. Key configuration options:
@@ -122,7 +190,7 @@ return [
     // Database configuration
     'database' => [
         'table_prefix' => 'real_estate_',
-        'properties_table' => 'properties',
+        'properties_table' => 'real_estate_properties',
         'use_soft_deletes' => true,
     ],
 
@@ -275,7 +343,7 @@ $types = PropertyType::getSelectOptions();
 
 The plugin creates the following tables:
 
-- `properties` - Main property listings
+- `real_estate_properties` - Main property listings
 - `real_estate_property_types` - Property type categories
 - `real_estate_districts` - Location districts
 - `real_estate_amenities` - Available amenities
@@ -321,6 +389,19 @@ This plugin is licensed under the [MIT License](LICENSE.md).
 - **Community Forum:** [https://community.tallcms.com](https://community.tallcms.com)
 
 ## Changelog
+
+### v1.0.2 (2025-11-25)
+- **Current Release**
+- Fixed table naming consistency (all tables now use `real_estate_` prefix)
+- Added comprehensive uninstall command with safety features
+- Enhanced plugin lifecycle management
+- Improved data preservation during uninstalls
+- Added convenience composer scripts for uninstall operations
+
+### v1.0.1 (2024-11-25)
+- Plugin registration improvements
+- Table existence checks for better error handling
+- Enhanced migration stability
 
 ### v1.0.0 (2024-11-25)
 - Initial release

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
+        Schema::table('real_estate_properties', function (Blueprint $table) {
             $table->string('tenure')->nullable()->after('property_type_id')
                   ->comment('Property tenure type (Freehold, 99-year, 999-year, etc.)');
             $table->index('tenure');
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
+        Schema::table('real_estate_properties', function (Blueprint $table) {
             $table->dropIndex(['tenure']);
             $table->dropColumn('tenure');
         });

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('real_estate_property_features', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained('properties')->onDelete('cascade');
+            $table->foreignId('property_id')->constrained('real_estate_properties')->onDelete('cascade');
             $table->foreignId('feature_id')->constrained('real_estate_features')->onDelete('cascade');
             $table->timestamps();
 

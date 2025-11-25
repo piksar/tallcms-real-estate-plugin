@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
+        Schema::table('real_estate_properties', function (Blueprint $table) {
             // Add foreign key references
             $table->foreignId('property_type_id')
                   ->nullable()
@@ -35,7 +35,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
+        Schema::table('real_estate_properties', function (Blueprint $table) {
             $table->dropConstrainedForeignId('property_type_id');
             $table->dropConstrainedForeignId('district_id');
         });

@@ -21,7 +21,7 @@ return [
     */
     'database' => [
         'table_prefix' => 'real_estate_',
-        'properties_table' => 'properties',
+        'properties_table' => 'real_estate_properties',
         'use_soft_deletes' => true,
         'timestamps' => true,
     ],

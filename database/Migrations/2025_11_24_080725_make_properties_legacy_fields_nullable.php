@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
+        Schema::table('real_estate_properties', function (Blueprint $table) {
             // Make legacy property_type field nullable since we're using property_type_id now
             $table->string('property_type')->nullable()->change();
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
+        Schema::table('real_estate_properties', function (Blueprint $table) {
             $table->string('property_type')->nullable(false)->change();
         });
     }
