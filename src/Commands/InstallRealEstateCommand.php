@@ -4,19 +4,21 @@ namespace TallCms\RealEstate\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class InstallRealEstateCommand extends Command
 {
     protected $signature = 'real-estate:install 
-                           {--fresh : Run fresh migrations (warning: will drop existing data)}
+                           {--fresh : Reset ONLY plugin tables and re-install (safe: preserves users and other data)}
                            {--seed : Run seeders after installation}
                            {--demo : Install with demo data (50 sample properties)}
                            {--publish : Publish config, views, and migrations for customization}';
 
     protected $description = 'Install the TALL CMS Real Estate plugin';
 
-    public function handle()
+    public function handle(): int
     {
         $this->info('🏠 Installing TALL CMS Real Estate Plugin...');
 
@@ -28,7 +30,9 @@ class InstallRealEstateCommand extends Command
         }
 
         // Step 1: Run migrations
-        $this->runMigrations();
+        if (!$this->runMigrations()) {
+            return self::FAILURE;
+        }
         
         // Step 2: Seed reference data
         $this->seedReferenceData();
@@ -43,6 +47,8 @@ class InstallRealEstateCommand extends Command
 
         $this->info('✅ Real Estate plugin installed successfully!');
         $this->displayPostInstallInstructions();
+        
+        return self::SUCCESS;
     }
 
     private function publishMigrations(): void
@@ -81,16 +87,16 @@ class InstallRealEstateCommand extends Command
         $this->line('   Views published to resources/views/vendor/real-estate');
     }
 
-    private function runMigrations(): void
+    private function runMigrations(): bool
     {
         $this->info('🗃️  Running migrations...');
         
         if ($this->option('fresh')) {
-            if ($this->confirm('⚠️  This will drop all existing data. Continue?', false)) {
-                Artisan::call('migrate:fresh');
+            if ($this->confirm('⚠️  This will reset ONLY the Real Estate plugin tables and data. Continue?', false)) {
+                $this->freshInstallPluginMigrations();
             } else {
-                $this->error('Installation cancelled');
-                return;
+                $this->error('Installation cancelled - no changes made');
+                return false;
             }
         } else {
             // First run main migrations
@@ -106,56 +112,77 @@ class InstallRealEstateCommand extends Command
         }
         
         $this->line('   Database migrations completed');
+        return true;
+    }
+
+    /**
+     * Safely reset only the Real Estate plugin tables and data
+     */
+    private function freshInstallPluginMigrations(): void
+    {
+        $this->info('🧹 Resetting Real Estate plugin tables...');
+        
+        $pluginTables = $this->pluginTables();
+        
+        try {
+            Schema::disableForeignKeyConstraints();
+            
+            foreach ($pluginTables as $table) {
+                if (Schema::hasTable($table)) {
+                    Schema::dropIfExists($table);
+                    $this->line("   Dropped table: {$table}");
+                }
+            }
+            
+            // Remove plugin migration records
+            $migrationRecords = $this->pluginMigrationNames();
+            
+            DB::table('migrations')->whereIn('migration', $migrationRecords)->delete();
+            $this->line('   Removed plugin migration records');
+            
+            // Re-run plugin migrations
+            $migrationPath = __DIR__ . '/../../database/Migrations';
+            if (is_dir($migrationPath)) {
+                Artisan::call('migrate', [
+                    '--path' => str_replace(base_path() . '/', '', $migrationPath)
+                ]);
+                $this->line('   Re-ran plugin migrations');
+            }
+            
+        } catch (\Exception $e) {
+            $this->error('Failed to reset plugin tables: ' . $e->getMessage());
+            throw $e;
+        } finally {
+            Schema::enableForeignKeyConstraints();
+        }
     }
 
     private function seedReferenceData(): void
     {
         $this->info('🌱 Seeding reference data...');
         
-        // Try to include and run the seeder directly
+        $class = \TallCms\RealEstate\Database\Seeders\RealEstateReferenceDataSeeder::class;
+
         try {
-            $seederPath = __DIR__ . '/../../database/Seeders/RealEstateReferenceDataSeeder.php';
-            if (file_exists($seederPath)) {
-                require_once $seederPath;
-                $seeder = new \TallCms\RealEstate\Database\Seeders\RealEstateReferenceDataSeeder();
-                $seeder->run();
-            } else {
-                // Fallback to artisan command
-                Artisan::call('db:seed', [
-                    '--class' => 'TallCms\\RealEstate\\Database\\Seeders\\RealEstateReferenceDataSeeder'
-                ]);
-            }
+            $this->call('db:seed', ['--class' => $class]);
+            $this->line('   Reference data seeded (property types, districts, etc.)');
         } catch (\Exception $e) {
             $this->error('Failed to seed reference data: ' . $e->getMessage());
-            return;
         }
-        
-        $this->line('   Reference data seeded (property types, districts, etc.)');
     }
 
     private function seedDemoData(): void
     {
         $this->info('🏘️  Installing demo properties...');
         
-        // Try to include and run the seeder directly
+        $class = \TallCms\RealEstate\Database\Seeders\PropertySeeder::class;
+
         try {
-            $seederPath = __DIR__ . '/../../database/Seeders/PropertySeeder.php';
-            if (file_exists($seederPath)) {
-                require_once $seederPath;
-                $seeder = new \TallCms\RealEstate\Database\Seeders\PropertySeeder();
-                $seeder->run();
-            } else {
-                // Fallback to artisan command
-                Artisan::call('db:seed', [
-                    '--class' => 'TallCms\\RealEstate\\Database\\Seeders\\PropertySeeder'
-                ]);
-            }
+            $this->call('db:seed', ['--class' => $class]);
+            $this->line('   50 demo properties installed');
         } catch (\Exception $e) {
             $this->error('Failed to seed demo data: ' . $e->getMessage());
-            return;
         }
-        
-        $this->line('   50 demo properties installed');
     }
 
     private function registerWithTallCms(): void
@@ -163,6 +190,43 @@ class InstallRealEstateCommand extends Command
         $this->info('🔗 Registering with TALL CMS...');
         $this->line('   Plugin service provider will register blocks/resources automatically');
         $this->verifyBlockRegistration();
+    }
+
+    /**
+     * Build table list from config to avoid hard-coding names
+     */
+    private function pluginTables(): array
+    {
+        $dbConfig = config('real-estate.database', []);
+        $prefix = $dbConfig['table_prefix'] ?? 'real_estate_';
+        $propertiesTable = $dbConfig['properties_table'] ?? 'properties';
+
+        return [
+            $propertiesTable,
+            "{$prefix}property_types",
+            "{$prefix}districts",
+            "{$prefix}amenities",
+            "{$prefix}features",
+            "{$prefix}property_amenities",
+            "{$prefix}property_features",
+        ];
+    }
+
+    /**
+     * Build migration name list from plugin migration files
+     */
+    private function pluginMigrationNames(): array
+    {
+        $migrationPath = __DIR__ . '/../../database/Migrations';
+        if (!is_dir($migrationPath)) {
+            return [];
+        }
+
+        return collect(scandir($migrationPath))
+            ->filter(fn ($file) => Str::endsWith($file, '.php'))
+            ->map(fn ($file) => pathinfo($file, PATHINFO_FILENAME))
+            ->values()
+            ->all();
     }
 
     private function verifyBlockRegistration(): void

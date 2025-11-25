@@ -63,12 +63,30 @@ php artisan real-estate:install
 # Install with demo data (50 sample properties)
 php artisan real-estate:install --demo
 
-# Install with fresh migrations (⚠️ removes existing data)
+# Safe reset: ONLY plugin tables (preserves users, pages, etc.)
 php artisan real-estate:install --fresh
 
-# Install and seed reference data
+# Install and seed reference data only
 php artisan real-estate:install --seed
+
+# Publish configuration and views for customization
+php artisan real-estate:install --publish
 ```
+
+#### ⚠️ Important: Safe `--fresh` Option
+
+The `--fresh` option is **SAFE** and only affects Real Estate plugin tables:
+
+**What it does:**
+- ✅ Drops and recreates ONLY plugin tables
+- ✅ Preserves users, pages, and all other data  
+- ✅ Re-runs plugin migrations cleanly
+- ✅ Requires confirmation before proceeding
+
+**What it does NOT do:**
+- ❌ Does NOT affect users table
+- ❌ Does NOT affect pages or other CMS data
+- ❌ Does NOT run Laravel's `migrate:fresh` command
 
 ### Manual Installation
 
