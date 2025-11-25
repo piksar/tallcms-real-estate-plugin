@@ -16,6 +16,8 @@ class DistrictResource extends Resource
 {
     protected static ?string $model = District::class;
 
+    protected static ?string $slug = 'real-estate-districts';
+
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
     protected static ?string $navigationGroup = 'Real Estate Settings';
     protected static ?string $navigationLabel = 'Districts';

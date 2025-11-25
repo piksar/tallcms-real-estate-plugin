@@ -16,6 +16,8 @@ class PropertyTypeResource extends Resource
 {
     protected static ?string $model = PropertyType::class;
 
+    protected static ?string $slug = 'real-estate-property-types';
+
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
     protected static ?string $navigationGroup = 'Real Estate Settings';
     protected static ?string $navigationLabel = 'Property Types';

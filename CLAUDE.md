@@ -152,7 +152,7 @@ Real-time search functionality is powered by `PropertySearchComponent` with adva
 ### **CRITICAL: Version Tagging Workflow**
 This plugin is distributed via Packagist/Composer. **ALWAYS** follow this workflow when pushing changes to main:
 
-1. **Update composer.json version** (currently at `1.0.2`)
+1. **Update composer.json version** (currently at `1.0.3`)
 2. **Create and push git tag** matching the composer.json version
 3. **Push to main branch**
 

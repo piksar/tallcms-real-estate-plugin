@@ -390,8 +390,13 @@ This plugin is licensed under the [MIT License](LICENSE.md).
 
 ## Changelog
 
-### v1.0.2 (2025-11-25)
+### v1.0.3 (2025-11-25)
 - **Current Release**
+- Fix Filament resource routing after table name changes
+- Add explicit slugs to all admin resources to prevent route conflicts
+- Resolve "Route not defined" errors in admin panel
+
+### v1.0.2 (2025-11-25)
 - Fixed table naming consistency (all tables now use `real_estate_` prefix)
 - Added comprehensive uninstall command with safety features
 - Enhanced plugin lifecycle management

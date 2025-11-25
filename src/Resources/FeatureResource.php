@@ -16,6 +16,8 @@ class FeatureResource extends Resource
 {
     protected static ?string $model = Feature::class;
 
+    protected static ?string $slug = 'real-estate-features';
+
     protected static ?string $navigationIcon = 'heroicon-o-sparkles';
     protected static ?string $navigationGroup = 'Real Estate Settings';
     protected static ?string $navigationLabel = 'Features';

@@ -41,6 +41,8 @@ class PropertyResource extends Resource
 {
     protected static ?string $model = Property::class;
 
+    protected static ?string $slug = 'real-estate-properties';
+
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'Properties';
