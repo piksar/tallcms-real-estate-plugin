@@ -93,7 +93,16 @@ class InstallRealEstateCommand extends Command
                 return;
             }
         } else {
+            // First run main migrations
             Artisan::call('migrate');
+            
+            // Then run plugin-specific migrations from vendor path
+            $migrationPath = __DIR__ . '/../../database/Migrations';
+            if (is_dir($migrationPath)) {
+                Artisan::call('migrate', [
+                    '--path' => str_replace(base_path() . '/', '', $migrationPath)
+                ]);
+            }
         }
         
         $this->line('   Database migrations completed');
@@ -103,9 +112,23 @@ class InstallRealEstateCommand extends Command
     {
         $this->info('🌱 Seeding reference data...');
         
-        Artisan::call('db:seed', [
-            '--class' => 'TallCms\\RealEstate\\Database\\Seeders\\RealEstateReferenceDataSeeder'
-        ]);
+        // Try to include and run the seeder directly
+        try {
+            $seederPath = __DIR__ . '/../../database/Seeders/RealEstateReferenceDataSeeder.php';
+            if (file_exists($seederPath)) {
+                require_once $seederPath;
+                $seeder = new \TallCms\RealEstate\Database\Seeders\RealEstateReferenceDataSeeder();
+                $seeder->run();
+            } else {
+                // Fallback to artisan command
+                Artisan::call('db:seed', [
+                    '--class' => 'TallCms\\RealEstate\\Database\\Seeders\\RealEstateReferenceDataSeeder'
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->error('Failed to seed reference data: ' . $e->getMessage());
+            return;
+        }
         
         $this->line('   Reference data seeded (property types, districts, etc.)');
     }
@@ -114,9 +137,23 @@ class InstallRealEstateCommand extends Command
     {
         $this->info('🏘️  Installing demo properties...');
         
-        Artisan::call('db:seed', [
-            '--class' => 'TallCms\\RealEstate\\Database\\Seeders\\PropertySeeder'
-        ]);
+        // Try to include and run the seeder directly
+        try {
+            $seederPath = __DIR__ . '/../../database/Seeders/PropertySeeder.php';
+            if (file_exists($seederPath)) {
+                require_once $seederPath;
+                $seeder = new \TallCms\RealEstate\Database\Seeders\PropertySeeder();
+                $seeder->run();
+            } else {
+                // Fallback to artisan command
+                Artisan::call('db:seed', [
+                    '--class' => 'TallCms\\RealEstate\\Database\\Seeders\\PropertySeeder'
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->error('Failed to seed demo data: ' . $e->getMessage());
+            return;
+        }
         
         $this->line('   50 demo properties installed');
     }
