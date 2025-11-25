@@ -48,7 +48,8 @@ A comprehensive Real Estate plugin for TALL CMS featuring advanced property sear
 ### Via Composer
 
 ```bash
-composer require tallcms/real-estate-plugin
+composer require tallcms/real-estate-plugin:dev-main
+
 ```
 
 ### Run Installation Command
