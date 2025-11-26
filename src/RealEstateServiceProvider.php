@@ -59,8 +59,8 @@ class RealEstateServiceProvider extends PackageServiceProvider
         // Register Livewire components
         $this->registerLivewireComponents();
         
-        // Register Filament resources with the admin panel
-        $this->registerFilamentResources();
+        // Register Filament resources (let Filament auto-discover them)
+        $this->discoverFilamentResources();
         
         // Register blocks when the block manager is resolved
         $this->app->afterResolving(BlockManager::class, function (BlockManager $blockManager) {
@@ -93,27 +93,23 @@ class RealEstateServiceProvider extends PackageServiceProvider
     /**
      * Register Filament resources with the admin panel
      */
-    protected function registerFilamentResources(): void
+    protected function discoverFilamentResources(): void
     {
         try {
-            // Try to register directly with the admin panel
-            if (class_exists('\Filament\Facades\Filament')) {
-                $panel = \Filament\Facades\Filament::getPanel('admin');
+            // Register Filament resources for auto-discovery
+            if (class_exists('\Filament\Filament')) {
+                \Filament\Filament::registerResources([
+                    \TallCms\RealEstate\Resources\PropertyResource::class,
+                    \TallCms\RealEstate\Resources\PropertyTypeResource::class,
+                    \TallCms\RealEstate\Resources\DistrictResource::class,
+                    \TallCms\RealEstate\Resources\AmenityResource::class,
+                    \TallCms\RealEstate\Resources\FeatureResource::class,
+                ]);
                 
-                if ($panel) {
-                    $panel->resources([
-                        \TallCms\RealEstate\Resources\PropertyResource::class,
-                        \TallCms\RealEstate\Resources\PropertyTypeResource::class,
-                        \TallCms\RealEstate\Resources\DistrictResource::class,
-                        \TallCms\RealEstate\Resources\AmenityResource::class,
-                        \TallCms\RealEstate\Resources\FeatureResource::class,
-                    ]);
-                    
-                    logger()->debug('Real Estate Plugin: Registered resources directly with admin panel');
-                }
+                logger()->debug('Real Estate Plugin: Resources registered for auto-discovery');
             }
         } catch (\Exception $e) {
-            logger()->error('Real Estate Plugin: Failed to register Filament resources', [
+            logger()->error('Real Estate Plugin: Failed to register resources for discovery', [
                 'error' => $e->getMessage()
             ]);
         }
