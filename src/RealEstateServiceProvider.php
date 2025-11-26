@@ -5,6 +5,7 @@ namespace TallCms\RealEstate;
 use App\TallCms\PageBuilder\AbstractBlock;
 use App\TallCms\PageBuilder\BlockManager;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -58,8 +59,8 @@ class RealEstateServiceProvider extends PackageServiceProvider
         // Register Livewire components
         $this->registerLivewireComponents();
         
-        // Register Filament plugin (resources are attached via plugin)
-        $this->registerFilamentPlugin();
+        // Register Filament resources with the admin panel
+        $this->registerFilamentResources();
         
         // Register blocks when the block manager is resolved
         $this->app->afterResolving(BlockManager::class, function (BlockManager $blockManager) {
@@ -90,26 +91,39 @@ class RealEstateServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Register the Filament plugin with the admin panel
+     * Register Filament resources with the admin panel
      */
-    protected function registerFilamentPlugin(): void
+    protected function registerFilamentResources(): void
     {
-        try {
-            $plugin = $this->makePluginFromConfig();
-            $adminPanel = Filament::getPanel('admin');
-
-            if (method_exists($adminPanel, 'plugins')) {
-                $adminPanel->plugins([$plugin]);
-                logger()->debug('Real Estate Plugin: Registered plugin on admin panel');
-            } else {
-                logger()->warning('Real Estate Plugin: Admin panel does not support plugins method; skipping plugin registration');
+        // Register resources when Filament is serving requests
+        Filament::serving(function () {
+            // Check if plugin tables exist before registering admin resources
+            if (!$this->pluginTablesExist()) {
+                return;
             }
-            
-        } catch (\Exception $e) {
-            logger()->error('Real Estate Plugin: Failed to register Filament plugin', [
-                'error' => $e->getMessage()
-            ]);
-        }
+
+            try {
+                // Get the admin panel and register resources
+                $adminPanel = Filament::getCurrentPanel();
+                
+                if ($adminPanel && $adminPanel->getId() === 'admin') {
+                    Filament::registerResources([
+                        \TallCms\RealEstate\Resources\PropertyResource::class,
+                        \TallCms\RealEstate\Resources\PropertyTypeResource::class,
+                        \TallCms\RealEstate\Resources\DistrictResource::class,
+                        \TallCms\RealEstate\Resources\AmenityResource::class,
+                        \TallCms\RealEstate\Resources\FeatureResource::class,
+                    ]);
+                    
+                    logger()->debug('Real Estate Plugin: Registered resources with Filament');
+                }
+                
+            } catch (\Exception $e) {
+                logger()->error('Real Estate Plugin: Failed to register Filament resources', [
+                    'error' => $e->getMessage()
+                ]);
+            }
+        });
     }
 
     /**
@@ -145,7 +159,7 @@ class RealEstateServiceProvider extends PackageServiceProvider
             // Use the correct table name from our fixed implementation
             $propertiesTable = 'real_estate_properties';
             
-            return \Schema::hasTable($propertiesTable);
+            return Schema::hasTable($propertiesTable);
         } catch (\Exception $e) {
             return false;
         }
