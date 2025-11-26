@@ -390,8 +390,15 @@ This plugin is licensed under the [MIT License](LICENSE.md).
 
 ## Changelog
 
+### v1.0.4 (2025-11-25)
+- **Current Release**  
+- Fix Filament resource registration for admin panel access
+- Remove table existence checks preventing route registration
+- Implement direct migration loading with loadMigrationsFrom()
+- Multiple approaches to resolve route not found errors
+- Improve plugin compatibility with TALL CMS Filament panels
+
 ### v1.0.3 (2025-11-25)
-- **Current Release**
 - Fix Filament resource routing after table name changes
 - Add explicit slugs to all admin resources to prevent route conflicts
 - Resolve "Route not defined" errors in admin panel
