@@ -95,19 +95,13 @@ class RealEstateServiceProvider extends PackageServiceProvider
      */
     protected function registerFilamentResources(): void
     {
-        // Register resources when Filament is serving requests
-        Filament::serving(function () {
-            // Check if plugin tables exist before registering admin resources
-            if (!$this->pluginTablesExist()) {
-                return;
-            }
-
-            try {
-                // Get the admin panel and register resources
-                $adminPanel = Filament::getCurrentPanel();
+        try {
+            // Try to register directly with the admin panel
+            if (class_exists('\Filament\Facades\Filament')) {
+                $panel = \Filament\Facades\Filament::getPanel('admin');
                 
-                if ($adminPanel && $adminPanel->getId() === 'admin') {
-                    Filament::registerResources([
+                if ($panel) {
+                    $panel->resources([
                         \TallCms\RealEstate\Resources\PropertyResource::class,
                         \TallCms\RealEstate\Resources\PropertyTypeResource::class,
                         \TallCms\RealEstate\Resources\DistrictResource::class,
@@ -115,15 +109,14 @@ class RealEstateServiceProvider extends PackageServiceProvider
                         \TallCms\RealEstate\Resources\FeatureResource::class,
                     ]);
                     
-                    logger()->debug('Real Estate Plugin: Registered resources with Filament');
+                    logger()->debug('Real Estate Plugin: Registered resources directly with admin panel');
                 }
-                
-            } catch (\Exception $e) {
-                logger()->error('Real Estate Plugin: Failed to register Filament resources', [
-                    'error' => $e->getMessage()
-                ]);
             }
-        });
+        } catch (\Exception $e) {
+            logger()->error('Real Estate Plugin: Failed to register Filament resources', [
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
