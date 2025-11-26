@@ -99,16 +99,8 @@ class InstallRealEstateCommand extends Command
                 return false;
             }
         } else {
-            // First run main migrations
-            Artisan::call('migrate');
-            
-            // Then run plugin-specific migrations from vendor path
-            $migrationPath = __DIR__ . '/../../database/Migrations';
-            if (is_dir($migrationPath)) {
-                Artisan::call('migrate', [
-                    '--path' => str_replace(base_path() . '/', '', $migrationPath)
-                ]);
-            }
+            // Run all migrations (includes auto-discovered package migrations)
+            Artisan::call('migrate', [], $this->output);
         }
         
         $this->line('   Database migrations completed');
@@ -140,14 +132,9 @@ class InstallRealEstateCommand extends Command
             DB::table('migrations')->whereIn('migration', $migrationRecords)->delete();
             $this->line('   Removed plugin migration records');
             
-            // Re-run plugin migrations
-            $migrationPath = __DIR__ . '/../../database/Migrations';
-            if (is_dir($migrationPath)) {
-                Artisan::call('migrate', [
-                    '--path' => str_replace(base_path() . '/', '', $migrationPath)
-                ]);
-                $this->line('   Re-ran plugin migrations');
-            }
+            // Re-run all migrations (includes auto-discovered package migrations)
+            Artisan::call('migrate', [], $this->output);
+            $this->line('   Re-ran plugin migrations');
             
         } catch (\Exception $e) {
             $this->error('Failed to reset plugin tables: ' . $e->getMessage());
