@@ -99,7 +99,7 @@ class InstallRealEstateCommand extends Command
                 return false;
             }
         } else {
-            // Run all migrations (includes auto-discovered package migrations)
+            // Run all migrations (migrations are loaded directly by service provider)
             Artisan::call('migrate', [], $this->output);
         }
         

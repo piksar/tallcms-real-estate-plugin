@@ -52,6 +52,9 @@ class RealEstateServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        // Load migrations directly (more reliable than hasMigrations)
+        $this->loadMigrationsFrom(__DIR__.'/../database/Migrations');
+        
         // Register Livewire components
         $this->registerLivewireComponents();
         
