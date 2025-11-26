@@ -1,6 +1,6 @@
 {
     "name": "tallcms/real-estate-plugin",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "A comprehensive Real Estate plugin for TALL CMS with advanced property search, filtering, and management features.",
     "keywords": ["tallcms", "real-estate", "property", "livewire", "filament", "laravel"],
     "type": "library",
@@ -47,7 +47,7 @@
             "plugin": {
                 "name": "Real Estate",
                 "description": "Comprehensive real estate property management and search",
-                "version": "1.0.3",
+                "version": "1.0.4",
                 "author": "TALL CMS Team",
                 "blocks": [
                     "TallCms\\RealEstate\\Blocks\\PropertySearchBlock",
