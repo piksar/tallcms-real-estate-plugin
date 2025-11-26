@@ -95,12 +95,6 @@ class RealEstateServiceProvider extends PackageServiceProvider
     protected function registerFilamentPlugin(): void
     {
         try {
-            // Check if plugin tables exist before registering admin resources
-            if (!$this->pluginTablesExist()) {
-                logger()->info('Real Estate Plugin: Tables not found, skipping admin panel registration. Run "php artisan real-estate:install" first.');
-                return;
-            }
-
             $plugin = $this->makePluginFromConfig();
             $adminPanel = Filament::getPanel('admin');
 
@@ -124,12 +118,6 @@ class RealEstateServiceProvider extends PackageServiceProvider
     protected function registerPropertyBlocks(BlockManager $blockManager): void
     {
         try {
-            // Check if plugin tables exist before registering blocks
-            if (!$this->pluginTablesExist()) {
-                logger()->info('Real Estate Plugin: Tables not found, skipping block registration. Run "php artisan real-estate:install" first.');
-                return;
-            }
-
             $blocks = $this->enabledBlocks();
 
             foreach ($blocks as $blockClass) {
